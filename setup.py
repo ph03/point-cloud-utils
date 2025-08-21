@@ -20,8 +20,8 @@ class CMakeExtension(setuptools.Extension):
 
 class CMakeBuild(build_ext):
     def run(self):
-        if os.path.exists('.git'):
-            subprocess.check_call(['git', 'submodule', 'update', '--init', '--recursive'])
+        #if os.path.exists('.git'):
+        #    subprocess.check_call(['git', 'submodule', 'update', '--init', '--recursive'])
 
         try:
             out = subprocess.check_output(['cmake', '--version'])
@@ -62,7 +62,7 @@ class CMakeBuild(build_ext):
                 build_args += ['--', '/m']
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
-            build_args += ['--', '-j2']
+            build_args += ['--', '-j32']
 
         env = os.environ.copy()
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''), self.distribution.get_version())
@@ -71,8 +71,9 @@ class CMakeBuild(build_ext):
             
         if platform.processor() == 'arm':
             cmake_args += ['-DCMAKE_OSX_ARCHITECTURES:STRING=arm64']
-        subprocess.check_call(['cmake'] + cmake_args + [ext.sourcedir], cwd=self.build_temp, env=env)
-        subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
+        print(subprocess.check_output(['/usr/bin/cmake', '--version']))
+        print(subprocess.check_output(['/usr/bin/cmake'] + cmake_args + [ext.sourcedir], cwd=self.build_temp, env=env))
+        print(subprocess.check_output(['/usr/bin/cmake', '--build', '.'] + build_args, cwd=self.build_temp))
         print()  # Add an empty line for cleaner output
 
 

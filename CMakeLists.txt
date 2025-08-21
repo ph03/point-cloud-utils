@@ -17,7 +17,7 @@ endif()
 
 # Turn this off if you want to build on Arm.
 # option(NATIVE_SSE          "Whether to use the default optimization setup"     ${USING_ARM})
-set(NATIVE_SSE ${NOT_USING_ARM})
+set(NATIVE_SSE OFF)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
@@ -85,7 +85,7 @@ target_include_directories(manifold PRIVATE ${EXTERNAL_DEP_DIR}/manifold/3rd)
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_options(manifold PRIVATE "${CMAKE_CXX_FLAGS} -Wall -pthread -DWITH_OMP  -Wno-int-in-bool-context -Wsign-compare -fsanitize=address")
 else()
-    target_compile_options(manifold PRIVATE "${CMAKE_CXX_FLAGS} -DWITH_OMP ")
+    #target_compile_options(manifold PRIVATE "${CMAKE_CXX_FLAGS} -DWITH_OMP")
 endif()
 
 
@@ -111,54 +111,54 @@ endif()
 #  target_compile_definitions(Eigen3::Eigen INTERFACE EIGEN_USE_MKL_ALL)
 #endif(${EIGEN_WITH_MKL})
 
-# Embree
-set(EMBREE_DIR "${EXTERNAL_DEP_DIR}/embree")
-if(NOT TARGET embree)
-  download_dep(embree
-               GIT_REPOSITORY https://github.com/embree/embree.git
-               GIT_TAG        v3.13.5
-  )
+## Embree
+#set(EMBREE_DIR "${EXTERNAL_DEP_DIR}/embree")
+#if(NOT TARGET embree)
+#  download_dep(embree
+#               GIT_REPOSITORY https://github.com/ph03/embree.git
+#               GIT_TAG        v3.13.5-arm64
+#  )
+#
+#  # Note: On macOS, building embree as a static lib can only be done with a single ISA target.
+#  set(EMBREE_MAX_ISA "DEFAULT" CACHE STRING "Selects highest ISA to support.")
+#  set(EMBREE_TESTING_INTENSITY 0 CACHE STRING "")
+#  set(EMBREE_ISPC_SUPPORT OFF CACHE BOOL " ")
+#  set(EMBREE_TASKING_SYSTEM "INTERNAL" CACHE BOOL " ")
+#  set(EMBREE_TUTORIALS OFF CACHE BOOL " ")
+#  set(EMBREE_STATIC_LIB ON CACHE BOOL " ")
+#  if(MSVC)
+#    set(EMBREE_STATIC_RUNTIME ON CACHE BOOL "Use the static version of the C/C++ runtime library.")
+#  endif()
+#
+#  add_subdirectory("${EMBREE_DIR}" "embree" EXCLUDE_FROM_ALL)
+#endif()
+##compile_igl_module("embree")
+##target_link_libraries(igl_embree INTERFACE embree)
+##target_include_directories(igl_embree INTERFACE ${EMBREE_DIR}/include)
+##target_compile_definitions(igl_embree INTERFACE -DEMBREE_STATIC_LIB)
 
-  # Note: On macOS, building embree as a static lib can only be done with a single ISA target.
-  set(EMBREE_MAX_ISA "DEFAULT" CACHE STRING "Selects highest ISA to support.")
-  set(EMBREE_TESTING_INTENSITY 0 CACHE STRING "")
-  set(EMBREE_ISPC_SUPPORT OFF CACHE BOOL " ")
-  set(EMBREE_TASKING_SYSTEM "INTERNAL" CACHE BOOL " ")
-  set(EMBREE_TUTORIALS OFF CACHE BOOL " ")
-  set(EMBREE_STATIC_LIB ON CACHE BOOL " ")
-  if(MSVC)
-    set(EMBREE_STATIC_RUNTIME ON CACHE BOOL "Use the static version of the C/C++ runtime library.")
-  endif()
 
-  add_subdirectory("${EMBREE_DIR}" "embree" EXCLUDE_FROM_ALL)
-endif()
-#compile_igl_module("embree")
-#target_link_libraries(igl_embree INTERFACE embree)
-#target_include_directories(igl_embree INTERFACE ${EMBREE_DIR}/include)
-#target_compile_definitions(igl_embree INTERFACE -DEMBREE_STATIC_LIB)
-
-
-# Build geogram
-download_dep(geogram
-             GIT_REPOSITORY https://github.com/fwilliams/geogram-pcu.git
-             GIT_TAG        main
-)
-set(THIRD_PARTY_DIR ${EXTERNAL_DEP_DIR})
-include(geogram)
-target_compile_definitions(geogram PUBLIC _LIBCPP_ENABLE_CXX17_REMOVED_UNEXPECTED_FUNCTIONS)
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  SET_TARGET_PROPERTIES(geogram PROPERTIES COMPILE_FLAGS -fopenmp LINK_FLAGS -fopenmp)
-  target_compile_options(geogram PUBLIC    -fopenmp)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
-
-  find_package(OpenMP REQUIRED)
-  if(NOT TARGET OpenMP::OpenMP_CXX)
-    target_compile_options(OpenMP_TARGET INTERFACE ${OpenMP_CXX_FLAGS})
-    find_package(Threads REQUIRED)
-    target_link_libraries(OpenMP_TARGET INTERFACE Threads::Threads)
-    target_link_libraries(OpenMP_TARGET INTERFACE ${OpenMP_CXX_FLAGS})
-  endif()
-endif()
+## Build geogram
+#download_dep(geogram
+#             GIT_REPOSITORY https://github.com/ph03/geogram-pcu.git
+#             GIT_TAG        arm64
+#)
+#set(THIRD_PARTY_DIR ${EXTERNAL_DEP_DIR})
+#include(geogram)
+#target_compile_definitions(geogram PUBLIC _LIBCPP_ENABLE_CXX17_REMOVED_UNEXPECTED_FUNCTIONS)
+#if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+#  SET_TARGET_PROPERTIES(geogram PROPERTIES COMPILE_FLAGS -fopenmp LINK_FLAGS -fopenmp)
+#  target_compile_options(geogram PUBLIC    -fopenmp)
+#  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+#
+#  find_package(OpenMP REQUIRED)
+#  if(NOT TARGET OpenMP::OpenMP_CXX)
+#    target_compile_options(OpenMP_TARGET INTERFACE ${OpenMP_CXX_FLAGS})
+#    find_package(Threads REQUIRED)
+#    target_link_libraries(OpenMP_TARGET INTERFACE Threads::Threads)
+#    target_link_libraries(OpenMP_TARGET INTERFACE ${OpenMP_CXX_FLAGS})
+#  endif()
+#endif()
 
 set(PCU_BINDING_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/sample_mesh.cpp
@@ -174,8 +174,8 @@ set(PCU_BINDING_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/signed_distance.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/closest_point_on_mesh.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/connected_components.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/ray_mesh_intersection.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/ray_point_cloud_intersection.cpp
+  #${CMAKE_CURRENT_SOURCE_DIR}/src/ray_mesh_intersection.cpp
+  #${CMAKE_CURRENT_SOURCE_DIR}/src/ray_point_cloud_intersection.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/smooth.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/manifold.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/curvature.cpp
@@ -193,7 +193,7 @@ set(PCU_BINDING_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/adjacency_list.cpp
   )
 
-  set(PCU_BINDING_SOURCES ${PCU_BINDING_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/src/lloyd.cpp)
+  #set(PCU_BINDING_SOURCES ${PCU_BINDING_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/src/lloyd.cpp)
 
 # Create the python module
 npe_add_module(_pcu_internal
@@ -201,13 +201,13 @@ npe_add_module(_pcu_internal
   ${PCU_BINDING_SOURCES}
   EXTRA_MODULE_FUNCTIONS
   hack_extra_bindings
-  hack_extra_ray_mesh_bindings
+  #hack_extra_ray_mesh_bindings
 )
 
 # TODO: Make common into its own library that we link statically
 target_sources(_pcu_internal PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/common/morton_code.cpp)
-target_sources(_pcu_internal PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/common/geogram_utils.cpp)
-target_sources(_pcu_internal PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/common/embree_intersector.cpp)
+#target_sources(_pcu_internal PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/common/geogram_utils.cpp)
+#target_sources(_pcu_internal PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/common/embree_intersector.cpp)
 # target_sources(_pcu_internal PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/external/tinyply/source/tinyply.cpp)
 target_include_directories(_pcu_internal PRIVATE ${EXTERNAL_DEP_DIR}/tinyply/source)
 target_include_directories(_pcu_internal PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -216,8 +216,8 @@ target_include_directories(_pcu_internal PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ext
 target_include_directories(_pcu_internal PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/external/igl/include)
 target_include_directories(_pcu_internal PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/external/tinyobjloader)
 target_include_directories(_pcu_internal PRIVATE ${EMBREE_DIR}/include)
-target_link_libraries(_pcu_internal PRIVATE embree)
-target_link_libraries(_pcu_internal PRIVATE geogram)
+#target_link_libraries(_pcu_internal PRIVATE embree)
+#target_link_libraries(_pcu_internal PRIVATE geogram)
 target_link_libraries(_pcu_internal PRIVATE manifold)
 # target_link_libraries(_pcu_internal PRIVATE mls_utils)
 if(NATIVE_SSE)

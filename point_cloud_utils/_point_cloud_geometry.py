@@ -1,4 +1,4 @@
-from ._pcu_internal import point_cloud_splatting_geometry_internal_, \
+from ._pcu_internal import \
     _voxel_mesh_internal
 
 import numpy as np
@@ -62,41 +62,3 @@ def voxel_grid_geometry(ijk, voxel_size=np.array((1., 1., 1.)), voxel_origin=np.
                                 _coord3d_to_array(voxel_origin, dtype=np.float64),
                                 _number_or_coord3d_to_array(voxel_size, dtype=np.float64))
 
-
-def pointcloud_sphere_geometry(p, r, num_stacks, num_slices):
-    """
-    Generate sphere geometry for a point cloud (i.e. one sphere per point)
-
-    Args:
-        p : \#p by 3 array of vertex positions (each row is a vertex)
-        r : Array or Scalar describing the radius along each axis (Either one radius per vertex, or a global size for the whole point cloud)
-        num_stacks : Number of latitudal subdivisions
-        num_slices : Number of longitudal subdivisions
-
-    Returns:
-        verts : an array of shape (#output_vertices, 3)
-        faces : an array of shape (#output_faces, 3) indexing into verts
-
-    """
-    r = _validate_point_radius_internal(p, r)
-    return point_cloud_splatting_geometry_internal_(p, p, "sphere", r.astype(p.dtype), num_stacks, num_slices)
-
-
-def pointcloud_surfel_geometry(p, n, r=0.1, subdivs=7):
-    """
-    Generate geometry for a point cloud encoded as surfels (i.e. circular patches centered at each point and oriented
-    perpendicularly to each normal)
-
-    Args:
-        p : \#p by 3 array of vertex positions (each row is a vertex)
-        n : \#p by 3 array of vertex normals (each row is a vertex)
-        r : Array or Scalar describing the size of each geometry element (Either one radius per vertex, or a global size for the whole point cloud)
-        subdivs : Number of times to subdivide the patch geometry for each point (i.e. # tris per cicle)
-
-    Returns:
-        verts : an array of shape (#output_vertices, 3)
-        faces : an array of shape (#output_faces, 3) indexing into verts
-
-    """
-    r = _validate_point_radius_internal(p, r)
-    return point_cloud_splatting_geometry_internal_(p, n, "circle", r.astype(p.dtype), subdivs)

@@ -6,9 +6,8 @@ from ._pcu_internal import sample_mesh_poisson_disk, sample_mesh_random, \
     estimate_mesh_face_normals, orient_mesh_faces, \
     k_nearest_neighbors, one_sided_hausdorff_distance, \
     morton_encode, morton_decode, morton_knn, \
-    lloyd_2d, lloyd_3d, voronoi_centroids_unit_cube, sample_mesh_lloyd, \
     deduplicate_point_cloud, deduplicate_mesh_vertices, signed_distance_to_mesh, \
-    closest_points_on_mesh, connected_components, ray_mesh_intersection, laplacian_smooth_mesh, \
+    closest_points_on_mesh, connected_components, laplacian_smooth_mesh, \
     make_mesh_watertight, \
     morton_add, morton_subtract, point_cloud_fast_winding_number, \
     sparse_voxel_grid_boundary, marching_cubes_sparse_voxel_grid, decimate_triangle_mesh, \
@@ -19,9 +18,7 @@ from ._pcu_internal import sample_mesh_poisson_disk, sample_mesh_random, \
 from ._sinkhorn import *
 from ._mesh_io import *
 from ._pointcloud_normals import estimate_point_cloud_normals_knn, estimate_point_cloud_normals_ball
-from ._ray_mesh_intersector import RayMeshIntersector
-from ._ray_point_cloud_intersector import ray_surfel_intersection, RaySurfelIntersector
-from ._point_cloud_geometry import voxel_grid_geometry, pointcloud_sphere_geometry, pointcloud_surfel_geometry
+from ._point_cloud_geometry import voxel_grid_geometry
 from ._voxels import flood_fill_3d, voxelize_triangle_mesh
 from ._mesh_primitives import sphere_mesh, cube_mesh, cylinder_mesh, cone_mesh
 
